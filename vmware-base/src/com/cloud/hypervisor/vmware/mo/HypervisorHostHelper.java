@@ -1461,13 +1461,25 @@ public class HypervisorHostHelper {
 
         VmwareHelper.setBasicVmConfig(vmConfig, cpuCount, cpuSpeedMHz, cpuReservedMHz, memoryMB, memoryReserveMB, guestOsIdentifier, limitCpuUse);
 
+        int maxControllerCount = VmwareHelper.MAX_SCSI_CONTROLLER_COUNT;
         String recommendedController = host.getRecommendedDiskController(guestOsIdentifier);
         String newRootDiskController = controllerInfo.first();
+        if (newRootDiskController.contains(",")) {
+            String[] parts = newRootDiskController.split(",");
+            newRootDiskController = parts[0];
+            maxControllerCount = Integer.parseInt(parts[1]);
+        }
         String newDataDiskController = controllerInfo.second();
-        if (DiskControllerType.getType(controllerInfo.first()) == DiskControllerType.osdefault) {
+        if (newDataDiskController.contains(",")) {
+            String[] parts = newDataDiskController.split(",");
+            newDataDiskController = parts[0];
+            maxControllerCount = Integer.parseInt(parts[1]);
+        }
+
+        if (DiskControllerType.getType(newRootDiskController) == DiskControllerType.osdefault) {
             newRootDiskController = recommendedController;
         }
-        if (DiskControllerType.getType(controllerInfo.second()) == DiskControllerType.osdefault) {
+        if (DiskControllerType.getType(newDataDiskController) == DiskControllerType.osdefault) {
             newDataDiskController = recommendedController;
         }
 
@@ -1476,7 +1488,6 @@ public class HypervisorHostHelper {
         // If there is requirement for a SCSI controller, ensure to create those.
         if (scsiDiskController != null) {
         int busNum = 0;
-            int maxControllerCount = VmwareHelper.MAX_SCSI_CONTROLLER_COUNT;
             if (systemVm) {
                 maxControllerCount = 1;
             }
