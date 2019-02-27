@@ -26,6 +26,9 @@ public enum DiskControllerType {
     pvscsi,
     none;
     public static DiskControllerType getType(String diskController) {
+        if (diskController != null && diskController.contains(",")) {
+            diskController = diskController.split(",")[0];
+        }
         if (diskController == null || diskController.equalsIgnoreCase("osdefault")) {
             return DiskControllerType.osdefault;
         } else if (diskController.equalsIgnoreCase("vim.vm.device.VirtualLsiLogicSASController") || diskController.equalsIgnoreCase("VirtualLsiLogicSASController")

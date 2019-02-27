@@ -466,7 +466,6 @@ public class HypervisorHostHelper {
     }
 
     /**
-     * @param ethPortProfileName
      * @param namePrefix
      * @param hostMo
      * @param vlanId
