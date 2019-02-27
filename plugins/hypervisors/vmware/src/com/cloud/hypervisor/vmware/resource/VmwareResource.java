@@ -1625,6 +1625,10 @@ public class VmwareResource implements StoragePoolResource, ServerResource, Vmwa
         // Get maximum among the bus numbers in use by scsi controllers. Safe to pick maximum, because we always go sequential allocating bus numbers.
         Ternary<Integer, Integer, DiskControllerType> scsiControllerInfo = vmMo.getScsiControllerInfo();
         int requiredNumScsiControllers = VmwareHelper.MAX_SCSI_CONTROLLER_COUNT - scsiControllerInfo.first();
+
+        if (rootDiskController.contains(",")) {
+            requiredNumScsiControllers = Integer.parseInt(rootDiskController.split(",")[0]);
+        }
         int availableBusNum = scsiControllerInfo.second() + 1; // method returned current max. bus number
 
         if (requiredNumScsiControllers == 0) {
